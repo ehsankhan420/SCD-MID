@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  #for the frontend
+  frontend:
+    build:
+      context: ./client
+      dockerfile: frontend.dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - mern-app
+
+  #for the backend
+  backend:
+    build:
+      context: ./Server
+      dockerfile: backend.dockerfile
+    ports:
+      - "4000:4000"
+    depends_on:
+      - database
+    environment:
+      - PORT=4000
+      - MONGO_DB=mongodb+srv://rockstarabhi53060:callofDUTY@cluster0.fpe9s.mongodb.net/social-media-app
+    volumes:
+      - ./Server/images:/usr/src/app/images
+    restart: unless-stopped
+    networks:
+      - mern-app
+
+  # for the database
+  database:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    networks:
+      - mern-app
+
+networks:
+  mern-app:
+    driver: bridge
+
+
+volumes:
+  mongodb_data:
+    driver: local 
